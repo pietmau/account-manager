@@ -66,18 +66,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         );
 
         builder.setScopes("profile");
-        Map<String, String> params = new HashMap<>();
-        //params.put("approval_prompt","auto");
-        //params.put("access_type","online");
-        //builder.setAdditionalParameters(params);
-//        if(mMainActivity.getLoginHint() != null){
-//            Map loginHintMap = new HashMap<String, String>();
-//            loginHintMap.put(LOGIN_HINT,mMainActivity.getLoginHint());
-//            builder.setAdditionalParameters(loginHintMap);
-//
-//            Log.i(LOG_TAG, String.format("login_hint: %s", mMainActivity.getLoginHint()));
-//        }
-
         AuthorizationRequest request = builder.build();
         String action = "com.pietrantuono.accountmanager.HANDLE_AUTHORIZATION_RESPONSE";
         Intent postAuthorizationIntent = new Intent(action);
@@ -127,19 +115,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         getSharedPreferences(Authenticator.SHARED_PREFERENCES_NAME, Context.MODE_MULTI_PROCESS).edit()
                 .putString(Authenticator.AUTH_STATE, authState.getRefreshToken())
                 .commit();
-
         Account account = new Account(Authenticator.ACCOUNT_NAME, Authenticator.ACCOUNT_TYPE);
-
-        String authtoken = authState.getAccessToken();
+        String authtoken = authState.getRefreshToken();
         String authtokenType = Authenticator.AUTH_TYPE;
-
-        // Creating the account on the device and setting the auth token we got
-        // (Not setting the auth token will cause another call to the server to authenticate the user)
         accountManager.addAccountExplicitly(account, Authenticator.PASSWORD, null);
         accountManager.setAuthToken(account, authtokenType, authtoken);
-
         accountManager.setPassword(account, Authenticator.PASSWORD);
-
         savedIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, Authenticator.ACCOUNT_NAME);
         savedIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Authenticator.ACCOUNT_TYPE);
         savedIntent.putExtra("Foo", authtoken);
