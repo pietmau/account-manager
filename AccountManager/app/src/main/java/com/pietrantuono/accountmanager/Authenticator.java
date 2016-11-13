@@ -17,8 +17,10 @@ import android.text.TextUtils;
  */
 
 public class Authenticator extends AbstractAccountAuthenticator {
-    public static String ACCOUNT_TYPE = "pirean";
+    public static final String ACCOUNT_TYPE = "pirean";
     public static final String AUTH_TYPE = "auth_type";
+    public static final String ACCOUNT_NAME = "user";
+    public static final String PASSWORD = "password";
     private final Context context;
 
     public Authenticator(Context context) {

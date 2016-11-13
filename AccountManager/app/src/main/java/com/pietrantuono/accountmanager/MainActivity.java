@@ -58,15 +58,20 @@ public class MainActivity extends AppCompatActivity {
     private void getTokenAndLogin() {
         Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
         Account curr = accounts[0];
-        try {
-            String ff = accountManager.blockingGetAuthToken(curr, AUTH_TYPE, true);
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        }
+        accountManager.getAuthToken(curr, AUTH_TYPE, true, new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
+                try {
+                    Bundle bnd = accountManagerFuture.getResult();
+
+                    final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+                    foo();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Handler());
+
 
     }
 

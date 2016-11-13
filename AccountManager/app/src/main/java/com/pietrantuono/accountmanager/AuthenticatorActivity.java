@@ -1,5 +1,8 @@
 package com.pietrantuono.accountmanager;
 
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorActivity;
+import android.accounts.AccountManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -25,10 +28,11 @@ import java.util.Map;
 /**
  * Created by Maurizio Pietrantuono, maurizio.pietrantuono@gmail.com
  */
-public class AuthenticatorActivity extends AppCompatActivity {
+public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private static final String USED_INTENT = "USED_INTENT";
     public static final String SHARED_PREFERENCES_NAME = "prefs";
     public static final String AUTH_STATE = "auth";
+    private AccountManager accountManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,6 +40,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
         TextView textView = new TextView(AuthenticatorActivity.this);
         textView.setText("FFFFFFF");
         setContentView(textView);
+        accountManager = AccountManager.get(AuthenticatorActivity.this);
         if (!intentContanisAuth(getIntent())) {
             authenticate();
         }
@@ -102,7 +107,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
         return false;
     }
 
-    private void handleAuthorizationResponse(@NonNull Intent intent) {
+    private void handleAuthorizationResponse(@NonNull final Intent intent) {
         AuthorizationResponse response = AuthorizationResponse.fromIntent(intent);
         AuthorizationException error = AuthorizationException.fromIntent(intent);
         final AuthState authState = new AuthState(response, error);
@@ -115,17 +120,29 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     } else {
                         if (tokenResponse != null) {
                             authState.update(tokenResponse, exception);
-                            persistAuthState(authState);
+                            persistAuthState(authState, intent);
                         }
                     }
                 }
             });
         }
     }
-    private void persistAuthState(@NonNull AuthState authState) {
-        getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE).edit()
-                .putString(AUTH_STATE, authState.toJsonString())
-                .commit();
+
+    private void persistAuthState(@NonNull AuthState authState, Intent intent) {
+        Account account = new Account(Authenticator.ACCOUNT_NAME, Authenticator.ACCOUNT_TYPE);
+
+        String authtoken = authState.getAccessToken();
+        String authtokenType = Authenticator.ACCOUNT_TYPE;
+
+        // Creating the account on the device and setting the auth token we got
+        // (Not setting the auth token will cause another call to the server to authenticate the user)
+        accountManager.addAccountExplicitly(account, Authenticator.PASSWORD, null);
+        accountManager.setAuthToken(account, authtokenType, authtoken);
+
+        accountManager.setPassword(account, Authenticator.PASSWORD);
+        setAccountAuthenticatorResult(intent.getExtras());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
 
