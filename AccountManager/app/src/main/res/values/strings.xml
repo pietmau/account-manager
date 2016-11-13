@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AccountManager</string>
+    <string name="app_name">App A</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
