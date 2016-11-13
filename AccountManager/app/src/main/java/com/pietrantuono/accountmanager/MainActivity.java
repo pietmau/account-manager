@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.pietrantuono.accountmanager.api.Api;
+import com.pietrantuono.accountmanager.authenticator.AuthenticatorActivity;
 import com.pietrantuono.accountmanager.pojos.TokenResponse;
 import com.pietrantuono.accountmanager.pojos.UserResponse;
 
@@ -23,7 +24,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.pietrantuono.accountmanager.authenticator.Authenticator.AUTH_TYPE;
+import static com.pietrantuono.accountmanager.authenticator.Authenticator.REFRESH_TOKEN_TYPE;
 import static com.pietrantuono.accountmanager.authenticator.Authenticator.ACCOUNT_TYPE;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,15 +47,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addAccountAndLogin() {
-        accountManager.addAccount(ACCOUNT_TYPE, AUTH_TYPE, null, null, MainActivity.this, new AccountManagerCallback<Bundle>() {
+        accountManager.addAccount(ACCOUNT_TYPE, REFRESH_TOKEN_TYPE, null, null, MainActivity.this, new AccountManagerCallback<Bundle>() {
             @Override
             public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
                 try {
-                    Bundle bar = accountManagerFuture.getResult();
-                    String authtoken = bar.getString("Foo");
-                    getAuthToken(authtoken);
-                } catch (Exception ignored) {
-                }
+                    Bundle bundle = accountManagerFuture.getResult();
+                    String refreshToken = bundle.getString(AuthenticatorActivity.REFRESH_TOKEN);
+                    getAuthToken(refreshToken);
+                } catch (Exception e) { e.printStackTrace();}
             }
 
 
@@ -66,12 +66,12 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.googleapis.com/")
+                .baseUrl(getString(R.string.base_url))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         Api service = retrofit.create(Api.class);
-        Call<TokenResponse> call = service.getNewAuthToken(refreshToken, "292906832055-ha4vjpa3oprvspeafobrjii7t26g2oe1.apps.googleusercontent.com", "refresh_token");
+        Call<TokenResponse> call = service.getNewAuthToken(refreshToken, getString(R.string.client_id), "refresh_token");
         call.enqueue(new Callback<TokenResponse>() {
             @Override
             public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
@@ -90,12 +90,12 @@ public class MainActivity extends AppCompatActivity {
     private void getTokenAndLogin() {
         Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
         Account curr = accounts[0];
-        accountManager.getAuthToken(curr, AUTH_TYPE, null, this, new AccountManagerCallback<Bundle>() {
+        accountManager.getAuthToken(curr, REFRESH_TOKEN_TYPE, null, this, new AccountManagerCallback<Bundle>() {
             @Override
             public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
                 try {
-                    Bundle bnd = accountManagerFuture.getResult();
-                    String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+                    Bundle bundle = accountManagerFuture.getResult();
+                    String authtoken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
                     getAuthToken(authtoken);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.googleapis.com/")
+                .baseUrl(getString(R.string.base_url))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -140,14 +140,8 @@ public class MainActivity extends AppCompatActivity {
         ImageLoader.getInstance().displayImage(response.getPicture(), imageView);
     }
 
-    private void foo() {
-
-    }
-
     private boolean accountExists() {
         Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
         return accounts.length > 0;
     }
-
-
 }
