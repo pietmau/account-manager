@@ -44,6 +44,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        intentContanisAuth(intent);
+    }
+
     private void authenticate() {
         AuthorizationServiceConfiguration serviceConfiguration = new AuthorizationServiceConfiguration(
                 Uri.parse("https://accounts.google.com/o/oauth2/v2/auth") /* auth endpoint */,
