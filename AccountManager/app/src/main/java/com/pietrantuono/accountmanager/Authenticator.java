@@ -81,6 +81,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
             //result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             //result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+            result.putString(AccountManager.KEY_ACCOUNT_NAME, ACCOUNT_NAME);
+            result.putString(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE);
             return result;
         }
         else {
@@ -91,6 +93,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
             final Bundle result = new Bundle();
             //result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             //result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+            result.putString(AccountManager.KEY_ACCOUNT_NAME, ACCOUNT_NAME);
+            result.putString(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
             return result;
         }

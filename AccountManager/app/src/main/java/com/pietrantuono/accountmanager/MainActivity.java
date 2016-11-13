@@ -36,9 +36,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         if (accountExists()) {
             getTokenAndLogin();
-        } else {
-            addAccountAndLogin();
         }
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addAccountAndLogin();
+            }
+        });
     }
 
     private void addAccountAndLogin() {

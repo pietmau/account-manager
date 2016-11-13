@@ -37,7 +37,7 @@
         </service>
 
         <activity android:name=".AuthenticatorActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             >
             <intent-filter>
                 <action android:name="com.pietrantuono.accountmanager.HANDLE_AUTHORIZATION_RESPONSE" />

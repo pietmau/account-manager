@@ -71,15 +71,14 @@ public class UserResponse {
 
     @Override
     public String toString() {
-        return "UserResponse{" +
-                "family_name='" + family_name + '\'' +
-                ", sub='" + sub + '\'' +
-                ", name='" + name + '\'' +
-                ", given_name='" + given_name + '\'' +
-                ", profile='" + profile + '\'' +
-                ", picture='" + picture + '\'' +
-                ", gender='" + gender + '\'' +
-                ", locale='" + locale + '\'' +
-                '}';
+        return
+                "name='" + name + '\'' +
+                 ", given_name='" + given_name + '\'' +
+                 "family_name='" + family_name + '\'' +
+                 ", sub='" + sub + '\'' +
+                 ", profile='" + profile + '\'' +
+                 ", picture='" + picture + '\'' +
+                 ", gender='" + gender + '\'' +
+                 ", locale='" + locale + ' ';
     }
 }

@@ -34,9 +34,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TextView textView = new TextView(AuthenticatorActivity.this);
-        textView.setText("FFFFFFF");
-        setContentView(textView);
         accountManager = AccountManager.get(AuthenticatorActivity.this);
         if (!intentContanisAuth(getIntent())) {
             savedIntent = getIntent();
