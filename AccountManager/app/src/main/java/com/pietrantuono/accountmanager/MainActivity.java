@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bnd = accountManagerFuture.getResult();
 
                     final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-gi                    foo();
+                    foo();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

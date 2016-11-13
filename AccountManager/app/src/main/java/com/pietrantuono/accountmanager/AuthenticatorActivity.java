@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
 
 import net.openid.appauth.AuthState;
@@ -31,6 +29,7 @@ import java.util.Map;
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private static final String USED_INTENT = "USED_INTENT";
     private AccountManager accountManager;
+    private Intent savedIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,17 +39,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         setContentView(textView);
         accountManager = AccountManager.get(AuthenticatorActivity.this);
         if (!intentContanisAuth(getIntent())) {
+            savedIntent = getIntent();
             authenticate();
         }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        foo();
-    }
-
-    private void foo() {
-
     }
 
     private void authenticate() {
@@ -118,7 +109,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                     } else {
                         if (tokenResponse != null) {
                             authState.update(tokenResponse, exception);
-                            persistAuthState(authState, intent,response);
+                            persistAuthState(authState);
                         }
                     }
                 }
@@ -126,7 +117,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
     }
 
-    private void persistAuthState(@NonNull AuthState authState, Intent intent, AuthorizationResponse response) {
+    private void persistAuthState(@NonNull AuthState authState) {
         getSharedPreferences(Authenticator.SHARED_PREFERENCES_NAME, Context.MODE_MULTI_PROCESS).edit()
                 .putString(Authenticator.AUTH_STATE, authState.getRefreshToken())
                 .commit();
@@ -142,11 +133,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         accountManager.setAuthToken(account, authtokenType, authtoken);
 
         accountManager.setPassword(account, Authenticator.PASSWORD);
-        intent = new Intent();
-        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, Authenticator.ACCOUNT_NAME);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Authenticator.ACCOUNT_TYPE);
-        setAccountAuthenticatorResult(intent.getExtras());
-        setResult(RESULT_OK, intent);
+
+        savedIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, Authenticator.ACCOUNT_NAME);
+        savedIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Authenticator.ACCOUNT_TYPE);
+        setAccountAuthenticatorResult(savedIntent.getExtras());
+        setResult(RESULT_OK, savedIntent);
         finish();
     }
 
