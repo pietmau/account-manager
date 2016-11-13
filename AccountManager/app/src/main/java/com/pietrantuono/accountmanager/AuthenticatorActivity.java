@@ -30,8 +30,6 @@ import java.util.Map;
  */
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private static final String USED_INTENT = "USED_INTENT";
-    public static final String SHARED_PREFERENCES_NAME = "prefs";
-    public static final String AUTH_STATE = "auth";
     private AccountManager accountManager;
 
     @Override
@@ -108,7 +106,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     private void handleAuthorizationResponse(@NonNull final Intent intent) {
-        AuthorizationResponse response = AuthorizationResponse.fromIntent(intent);
+        final AuthorizationResponse response = AuthorizationResponse.fromIntent(intent);
         AuthorizationException error = AuthorizationException.fromIntent(intent);
         final AuthState authState = new AuthState(response, error);
         if (response != null) {
@@ -120,7 +118,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                     } else {
                         if (tokenResponse != null) {
                             authState.update(tokenResponse, exception);
-                            persistAuthState(authState, intent);
+                            persistAuthState(authState, intent,response);
                         }
                     }
                 }
@@ -128,11 +126,15 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
     }
 
-    private void persistAuthState(@NonNull AuthState authState, Intent intent) {
+    private void persistAuthState(@NonNull AuthState authState, Intent intent, AuthorizationResponse response) {
+        getSharedPreferences(Authenticator.SHARED_PREFERENCES_NAME, Context.MODE_MULTI_PROCESS).edit()
+                .putString(Authenticator.AUTH_STATE, authState.getRefreshToken())
+                .commit();
+
         Account account = new Account(Authenticator.ACCOUNT_NAME, Authenticator.ACCOUNT_TYPE);
 
-        String authtoken = authState.getAccessToken();
-        String authtokenType = Authenticator.ACCOUNT_TYPE;
+        String authtoken = authState.getRefreshToken();
+        String authtokenType = Authenticator.AUTH_TYPE;
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
@@ -140,6 +142,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         accountManager.setAuthToken(account, authtokenType, authtoken);
 
         accountManager.setPassword(account, Authenticator.PASSWORD);
+        intent = new Intent();
+        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, Authenticator.ACCOUNT_NAME);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Authenticator.ACCOUNT_TYPE);
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
         finish();

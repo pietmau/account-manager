@@ -8,8 +8,15 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import net.openid.appauth.AuthorizationException;
+import net.openid.appauth.AuthorizationResponse;
+import net.openid.appauth.AuthorizationService;
+import net.openid.appauth.TokenResponse;
+
+import org.json.JSONException;
 
 
 /**
@@ -21,6 +28,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public static final String AUTH_TYPE = "auth_type";
     public static final String ACCOUNT_NAME = "user";
     public static final String PASSWORD = "password";
+    public static final String SHARED_PREFERENCES_NAME = "account_prefs";
+    public static final String AUTH_STATE = "auth_state";
     private final Context context;
 
     public Authenticator(Context context) {
@@ -74,17 +83,28 @@ public class Authenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
             return result;
         }
-
-        // If we get here, then we couldn't access the user's password - so we
-        // need to re-prompt them for their credentials. We do that by creating
-        // an intent to display our AuthenticatorActivity.
-        final Intent intent = new Intent(context, AuthenticatorActivity.class);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-//        intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, account.type);
-//        intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, authTokenType);
-        final Bundle bundle = new Bundle();
-        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        return bundle;
+        else {
+            authToken = restoreAuthState();
+            if(authToken!=null){
+                am.setAuthToken(account, Authenticator.AUTH_TYPE, authToken);
+            }
+            final Bundle result = new Bundle();
+            //result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+            //result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+            result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+            return result;
+        }
+//
+//        // If we get here, then we couldn't access the user's password - so we
+//        // need to re-prompt them for their credentials. We do that by creating
+//        // an intent to display our AuthenticatorActivity.
+//        final Intent intent = new Intent(context, AuthenticatorActivity.class);
+//        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+////        intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, account.type);
+////        intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, authTokenType);
+//        final Bundle bundle = new Bundle();
+//        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+//        return bundle;
     }
 
     @Override
@@ -107,4 +127,12 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public Bundle hasFeatures(AccountAuthenticatorResponse accountAuthenticatorResponse, Account account, String[] strings) throws NetworkErrorException {
         return null;
     }
+    @Nullable
+    private String restoreAuthState() {
+        String jsonString = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+                .getString(AUTH_STATE, null);
+
+        return jsonString;
+    }
+
 }

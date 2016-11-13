@@ -3,5 +3,5 @@
     android:accountType="pirean"
     android:icon="@mipmap/icon"
     android:smallIcon="@mipmap/icon"
-    android:label="Pirean"
+    android:label="@string/pirean"
     android:accountPreferences="@xml/prefs"/>
