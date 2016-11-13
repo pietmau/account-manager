@@ -1,4 +1,4 @@
-package com.pietrantuono.accountmanager;
+package com.pietrantuono.accountmanager.authenticator;
 
 import android.app.Service;
 import android.content.Intent;

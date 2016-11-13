@@ -23,8 +23,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.pietrantuono.accountmanager.Authenticator.AUTH_TYPE;
-import static com.pietrantuono.accountmanager.Authenticator.ACCOUNT_TYPE;
+import static com.pietrantuono.accountmanager.authenticator.Authenticator.AUTH_TYPE;
+import static com.pietrantuono.accountmanager.authenticator.Authenticator.ACCOUNT_TYPE;
 
 public class MainActivity extends AppCompatActivity {
     private AccountManager accountManager;

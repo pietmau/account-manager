@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".AuthenticatorService">
+        <service android:name=".authenticator.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -36,7 +36,7 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <activity android:name=".AuthenticatorActivity"
+        <activity android:name=".authenticator.AuthenticatorActivity"
             android:launchMode="singleTask"
             >
             <intent-filter>

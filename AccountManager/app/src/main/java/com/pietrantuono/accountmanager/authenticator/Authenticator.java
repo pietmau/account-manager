@@ -1,4 +1,4 @@
-package com.pietrantuono.accountmanager;
+package com.pietrantuono.accountmanager.authenticator;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -10,13 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
-import net.openid.appauth.AuthorizationException;
-import net.openid.appauth.AuthorizationResponse;
-import net.openid.appauth.AuthorizationService;
-import net.openid.appauth.TokenResponse;
-
-import org.json.JSONException;
 
 
 /**
