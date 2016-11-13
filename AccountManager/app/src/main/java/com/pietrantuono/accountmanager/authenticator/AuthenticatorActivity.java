@@ -26,6 +26,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private static final String USED_INTENT = "USED_INTENT";
     private AccountManager accountManager;
     private Intent savedIntent;
+    private AuthorizationService service;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,7 +89,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         AuthorizationException error = AuthorizationException.fromIntent(intent);
         final AuthState authState = new AuthState(response, error);
         if (response != null) {
-            AuthorizationService service = new AuthorizationService(this);
+            service = new AuthorizationService(this);
             service.performTokenRequest(response.createTokenExchangeRequest(), new AuthorizationService.TokenResponseCallback() {
                 @Override
                 public void onTokenRequestCompleted(@Nullable TokenResponse tokenResponse, @Nullable AuthorizationException exception) {
@@ -119,6 +120,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         savedIntent.putExtra("Foo", authtoken);
         setAccountAuthenticatorResult(savedIntent.getExtras());
         setResult(RESULT_OK, savedIntent);
+        service.dispose();
         finish();
     }
 
