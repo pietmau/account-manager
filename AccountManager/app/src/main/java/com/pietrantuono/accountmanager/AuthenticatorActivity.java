@@ -130,7 +130,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         Account account = new Account(Authenticator.ACCOUNT_NAME, Authenticator.ACCOUNT_TYPE);
 
-        String authtoken = authState.getRefreshToken();
+        String authtoken = authState.getAccessToken();
         String authtokenType = Authenticator.AUTH_TYPE;
 
         // Creating the account on the device and setting the auth token we got

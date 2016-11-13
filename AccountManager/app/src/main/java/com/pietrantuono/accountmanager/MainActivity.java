@@ -11,6 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import static com.pietrantuono.accountmanager.Authenticator.AUTH_TYPE;
 import static com.pietrantuono.accountmanager.Authenticator.ACCOUNT_TYPE;
 
@@ -22,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.get(MainActivity.this);
         setContentView(R.layout.activity_main);
-
         if (accountExists()) {
             getTokenAndLogin();
         } else {
@@ -37,24 +43,14 @@ public class MainActivity extends AppCompatActivity {
             public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
                 try {
                     Bundle bar = accountManagerFuture.getResult();
-                    String token = bar.getString("Foo");
-
-                    foo();
-                } catch (OperationCanceledException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (AuthenticatorException e) {
-                    e.printStackTrace();
+                    String authtoken = bar.getString("Foo");
+                    makeApiCall(authtoken);
+                } catch (Exception ignored) {
                 }
             }
 
 
         }, new Handler());
-    }
-
-    private void foo() {
-
     }
 
     private void getTokenAndLogin() {
@@ -65,9 +61,8 @@ public class MainActivity extends AppCompatActivity {
             public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
                 try {
                     Bundle bnd = accountManagerFuture.getResult();
-
-                    final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                    foo();
+                    String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+                    makeApiCall(authtoken);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -75,6 +70,33 @@ public class MainActivity extends AppCompatActivity {
         }, new Handler());
 
 
+    }
+
+    private void makeApiCall(String authtoken) {
+        if (authtoken == null) {
+            return;
+        }
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://www.googleapis.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Api service = retrofit.create(Api.class);
+        Call call =service.getUserInfo(String.format("Bearer %s", authtoken));
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                foo();
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                foo();
+            }
+        });
+    }
+
+    private void foo() {
     }
 
     private boolean accountExists() {
