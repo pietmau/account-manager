@@ -7,6 +7,15 @@ import android.accounts.AccountManagerFuture;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.pietrantuono.accountmanager.api.Api;
+import com.pietrantuono.accountmanager.pojos.TokenResponse;
+import com.pietrantuono.accountmanager.pojos.UserResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,16 +67,18 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Api service = retrofit.create(Api.class);
-        Call call = service.getToken(refreshToken, "292906832055-ha4vjpa3oprvspeafobrjii7t26g2oe1.apps.googleusercontent.com","refresh_token");
-        call.enqueue(new Callback() {
+        Call<TokenResponse> call = service.getNewAuthToken(refreshToken, "292906832055-ha4vjpa3oprvspeafobrjii7t26g2oe1.apps.googleusercontent.com", "refresh_token");
+        call.enqueue(new Callback<TokenResponse>() {
             @Override
-            public void onResponse(Call call, Response response) {
-                foo();
+            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
+                if (response != null && response.body() != null && response.body().getAccessToken() != null) {
+                    makeApiCall(response.body().getAccessToken());
+                }
             }
 
             @Override
-            public void onFailure(Call call, Throwable t) {
-                foo();
+            public void onFailure(Call<TokenResponse> call, Throwable t) {
+
             }
         });
     }
@@ -100,23 +111,29 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Api service = retrofit.create(Api.class);
-        Call call = service.getUserInfo(String.format("Bearer %s", authtoken));
-        call.enqueue(new Callback() {
+        Call<UserResponse> call = service.getUserInfo(String.format("Bearer %s", authtoken));
+        call.enqueue(new Callback<UserResponse>() {
             @Override
-            public void onResponse(Call call, Response response) {
-                populateUi(response);
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response != null && response.body() != null) {
+                    populateUi(response.body());
+                }
             }
 
             @Override
-            public void onFailure(Call call, Throwable t) {
-            }
+            public void onFailure(Call<UserResponse> call, Throwable t) {   }
         });
     }
 
-    private void populateUi(Response response) {
-        if(response == null || response.body() == null){return;}
-        Object body = response.body();
-        foo();
+    private void populateUi(UserResponse response) {
+        findViewById(R.id.not_logged).setVisibility(View.INVISIBLE);
+        findViewById(R.id.logged).setVisibility(View.VISIBLE);
+        TextView textView = (TextView) findViewById(R.id.text);
+        textView.setText(response.toString());
+        ImageView imageView = (ImageView) findViewById(R.id.image);
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(MainActivity.this).build();
+        ImageLoader.getInstance().init(config);
+        ImageLoader.getInstance().displayImage(response.getPicture(), imageView);
     }
 
     private void foo() {
