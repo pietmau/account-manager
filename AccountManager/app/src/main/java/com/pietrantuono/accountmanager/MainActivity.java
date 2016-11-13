@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
             public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
                 try {
                     Bundle bar = accountManagerFuture.getResult();
+                    String token = bar.getString("Foo");
+
                     foo();
                 } catch (OperationCanceledException e) {
                     e.printStackTrace();

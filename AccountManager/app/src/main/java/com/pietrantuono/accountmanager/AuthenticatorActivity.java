@@ -142,6 +142,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         savedIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, Authenticator.ACCOUNT_NAME);
         savedIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Authenticator.ACCOUNT_TYPE);
+        savedIntent.putExtra("Foo", authtoken);
         setAccountAuthenticatorResult(savedIntent.getExtras());
         setResult(RESULT_OK, savedIntent);
         finish();
